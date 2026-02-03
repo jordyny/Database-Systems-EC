@@ -1,0 +1,221 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+
+\title{Database Systems, CSCI 4380-01\\Homework \#1 Practice Problem for Question 1}
+\author{Jordyn Young}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Practice problem for Homework 1 Question 1}
+
+\textbf{Question 1 [48 points].} Write the following queries using relational algebra. You may use any
+valid relational algebra expression, break into multiple steps as needed. However, please make sure
+that your answers are well-formatted and are easily readable. Also, pay attention to the attributes
+required in the output!
+
+{\bf Database Description.} This is an Airline Data Analysis database.
+The database contains information about aircraft, airports, flights, bookings, and tickets. It contains the following
+relations:
+
+{\tt Aircraft(\underline{Code}, Model, Range)} \\
+{\tt Airports(\underline{Code}, Name, City, Latitude, Longitude, Timezone)} \\
+{\tt Flights(\underline{FId}, FlightNumber, ScheduledDeparture, ScheduledArrival, DepartureAirportCode, ArrivalAirportCode, AircraftCode, ActualDeparture, ActualArrival)} \\
+{\tt Tickets(\underline{TicketNo}, PassengerId)} \\
+{\tt TicketFlights(\underline{TicketNo}, FId, Fare, Amount)} \\
+{\tt Passengers(\underline{PassengerId}, FirstName, LastName, DOB)} \\
+
+The key of each relation is underlined.
+
+\vspace{0.75em}
+\noindent\textbf{(1)} Return the flight number, scheduled departure,
+departure airport name and city, and the aircraft model
+for all flights scheduled to depart in February 2026 and the aircraft used for the flight has a range of at least $5000$.
+
+
+
+\newpage
+\section*{Solution using standard notation}
+
+\subsection*{- Rename Airports to represent departure airports}
+
+\[
+\rho_{DepAirports(DepCode,DepName,DepCity,DepLatitude,DepLongitude,DepTimezone)}(Airports)
+\]
+
+This step creates a renamed copy of the \textit{Airports} relation that represents
+departure airports. This lets us distinguish departure airport attributes from any other airport info. Only attribute names are modified here.
+
+\subsection*{- Select flights scheduled to depart in February 2026}
+
+\[
+C1 = ScheduledDeparture::date \ge date\ '02/01/2026'
+\ \wedge\
+ScheduledDeparture::date \le date\ '02/28/2026'
+\]
+\[
+R1 = \sigma_{C1}(Flights)
+\]
+
+This step keeps only those flights whose scheduled departure
+date occurs in February 2026. All flights outside this time window are excluded.
+
+\subsection*{- Select aircraft with range at least 5000}
+
+\[
+C2 = Range \ge 5000
+\]
+\[
+R2 = \sigma_{C2}(Aircraft)
+\]
+
+This step restricts the \textit{Aircraft} relation to only have aircrafts that satisfy the minimum range
+requirement of at least 5000. 
+
+\subsection*{- Join flights with aircraft to attach the aircraft model}
+
+\[
+C3 = AircraftCode = Code
+\]
+\[
+R3 = R1 \bowtie_{C3} R2
+\]
+
+This join matches each flight in the relation with the aircraft used for that flight by comparing the
+flight's Aircraft Code with the aircraft's Code. The result attaches additional aircraft
+information to each remaining flight. At this point, every tuple represents
+a February 2026 flight that uses an aircraft with at least 5000.
+
+\subsection*{- Join with departure airports to get departure name/city}
+
+\[
+C4 = DepartureAirportCode = DepCode
+\]
+\[
+R4 = R3 \bowtie_{C4} DepAirports
+\]
+
+This join connects each flight to its corresponding departure airport using the departure airport code. The departure airport's name and city are added to each flight tuple. 
+\subsection*{- Project flight number, scheduled departure, departure airport name, departure city, and model}
+
+\[
+Result = \pi_{FlightNumber,\ ScheduledDeparture,\ DepName,\ DepCity,\ Model}(R4)
+\]
+
+The resulting relation contains one tuple per flight with the specified output attributes.
+
+\subsection*{Final answer}
+
+\[
+\rho_{DepAirports(DepCode,DepName,DepCity,DepLatitude,DepLongitude,DepTimezone)}(Airports)
+\]
+\[
+R1 = \sigma_{ScheduledDeparture::date \ge date\ '02/01/2026' \ \wedge\ ScheduledDeparture::date \le date\ '02/28/2026'}(Flights)
+\]
+\[
+R2 = \sigma_{Range \ge 5000}(Aircraft)
+\]
+\[
+R3 = R1 \bowtie_{AircraftCode = Code} R2
+\]
+\[
+R4 = R3 \bowtie_{DepartureAirportCode = DepCode} DepAirports
+\]
+\[
+Result = \pi_{FlightNumber,\ ScheduledDeparture,\ DepName,\ DepCity,\ Model}(R4)
+\]
+
+\newpage
+\section*{Solution using text notation}
+
+\subsection*{- Rename Airports to represent departure airports}
+
+\[
+\texttt{DepAirports(DepCode,DepName,DepCity,DepLatitude,DepLongitude,DepTimezone) = Airports}
+\]
+
+This step creates a renamed copy of the \textit{Airports} relation that represents
+departure airports. This lets us distinguish departure airport attributes from any other airport info. Only attribute names are modified here.
+
+\subsection*{- Select flights scheduled to depart in February 2026}
+
+\[
+\texttt{C1 = ScheduledDeparture::date >= date '02/01/2026' AND ScheduledDeparture::date <= date '02/28/2026'}
+\]
+\[
+\texttt{R1 = select\_C1(Flights)}
+\]
+
+This step keeps only those flights whose scheduled departure
+date occurs in February 2026. All flights outside this time window are excluded.
+
+\subsection*{- Select aircraft with range at least 5000}
+
+\[
+\texttt{C2 = Range >= 5000}
+\]
+\[
+\texttt{R2 = select\_C2(Aircraft)}
+\]
+
+This step restricts the \textit{Aircraft} relation to only have aircraft that satisfy the minimum range
+requirement of at least 5000.
+
+\subsection*{- Join flights with aircraft to attach the aircraft model}
+
+\[
+\texttt{C3 = AircraftCode = Code}
+\]
+\[
+\texttt{R3 = R1 join\_C3 R2}
+\]
+
+This join matches each flight in the relation with the aircraft used for that flight by comparing the
+flight's AircraftCode with the aircraft's Code. The result attaches additional aircraft
+information to each remaining flight.
+
+\subsection*{- Join with departure airports to get departure name/city}
+
+\[
+\texttt{C4 = DepartureAirportCode = DepCode}
+\]
+\[
+\texttt{R4 = R3 join\_C4 DepAirports}
+\]
+
+This join connects each flight to its corresponding departure airport using the departure airport code.
+The departure airport's name and city are added to each flight tuple.
+
+\subsection*{- Project flight number, scheduled departure, departure airport name, departure city, and model}
+
+\[
+\texttt{Result = project\_(FlightNumber, ScheduledDeparture, DepName, DepCity, Model)(R4)}
+\]
+
+The resulting relation contains one tuple per flight with the specified output attributes.
+
+\subsection*{Final answer}
+
+\[
+\texttt{DepAirports(DepCode,DepName,DepCity,DepLatitude,DepLongitude,DepTimezone) = Airports}
+\]
+\[
+\texttt{R1 = select\_(ScheduledDeparture::date >= date '02/01/2026' AND ScheduledDeparture::date <= date '02/28/2026')(Flights)}
+\]
+\[
+\texttt{R2 = select\_(Range >= 5000)(Aircraft)}
+\]
+\[
+\texttt{R3 = R1 join\_(AircraftCode = Code) R2}
+\]
+\[
+\texttt{R4 = R3 join\_(DepartureAirportCode = DepCode) DepAirports}
+\]
+\[
+\texttt{Result = project\_(FlightNumber, ScheduledDeparture, DepName, DepCity, Model)(R4)}
+\]
+
+
+\end{document}
