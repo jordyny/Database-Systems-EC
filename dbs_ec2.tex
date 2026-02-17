@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\title{Databse Systems Extra Credit Hw 2}
+\author{Jordyn Young}
+\date{February 2026}
+
+\begin{document}
+
+\maketitle
+
+\section*{Practice Problem for Homework 2 Question 4}
+
+\textbf{Question 4 [10 points].} Convert the following set of functional dependencies to minimal basis.\\
+Show all steps:
+\[
+F=\{A\to B,\; B\to C,\; A\to C,\; C\to D,\; CD\to E,\; C\to E,\; AB\to G,\; DG\to H\}.
+\]
+
+\subsubsection*{Solution}
+
+compute a minimal basis by doing the following:
+(1) split RHS attributes, (2) remove extraneous LHS attributes, (3) remove redundant dependencies.
+
+\paragraph{Step 1: Split RHS into single attributes (and remove trivial FDs)}
+Each FD already has a single attribute on the RHS, and none are trivial.
+
+\paragraph{Step 2: Remove extraneous attributes from LHS}
+Only $AB\to G$ has a multi-attribute LHS.
+
+\textbf{Check if $A$ is extraneous in $AB\to G$:} 
+\[
+(B)^+ = \{B\}\xrightarrow{B\to C}\{B,C\}\xrightarrow{C\to D}\{B,C,D\}\xrightarrow{CD\to E}\{B,C,D,E\}.
+\]
+$G\notin (B)^+$, so $A$ is not extraneous.
+
+\textbf{Check if $B$ is extraneous in $AB\to G$:} 
+\[
+(A)^+ = \{A\}\xrightarrow{A\to B}\{A,B\}\xrightarrow{B\to C}\{A,B,C\}\xrightarrow{C\to D}\{A,B,C,D\}\xrightarrow{CD\to E}\{A,B,C,D,E\}.
+\]
+$G\notin (A)^+$, so $B$ is not extraneous.
+
+Therefore, no LHS attributes can be removed, and
+\[
+F_2 = F_1.
+\]
+
+\paragraph{Step 3: Remove redundant dependencies}
+For each FD $X\to Y$, remove it and check whether $Y\in X^+$ under the remaining FDs.
+
+\medskip
+\noindent\textbf{(a) Test redundancy of $A\to C$:}
+
+Let $F' = F_2\setminus\{A\to C\}$. Compute $A^+$ under $F'$:
+\[
+A^+ = \{A\}\xrightarrow{A\to B}\{A,B\}\xrightarrow{B\to C}\{A,B,C\}.
+\]
+Thus $C\in A^+$, so $A\to C$ is implied by the others and is redundant. Remove it.
+
+\medskip
+\noindent\textbf{(b) Test redundancy of $C\to E$:}
+
+Let $F'' = (F_2\setminus\{A\to C\})\setminus\{C\to E\}$. Compute $C^+$ under $F''$:
+\[
+C^+ = \{C\}\xrightarrow{C\to D}\{C,D\}.
+\]
+$CD\to E$ applies:
+\[
+\{C,D\}\xrightarrow{CD\to E}\{C,D,E\}.
+\]
+Thus $E\in C^+$, so $C\to E$ is implied by the others and is redundant. Remove it.
+
+\medskip
+\noindent\textbf{(c) Check remaining FDs are not redundant (briefly):}
+\begin{itemize}
+\item Without $A\to B$, $B$ cannot be derived from $A$.
+\item Without $B\to C$, $C$ cannot be derived from $B$.
+\item Without $C\to D$, $D$ cannot be derived from $C$.
+\item Without $CD\to E$, there is no rule left that produces $E$.
+\item Without $AB\to G$, there is no rule left that produces $G$.
+\item Without $DG\to H$, there is no rule left that produces $H$.
+\end{itemize}
+thus no further redundancies remain.
+
+\subsubsection*{Final Minimal Basis}
+minimal basis is:
+\[
+\boxed{F_{\min}=\{A\to B,\; B\to C,\; C\to D,\; CD\to E,\; AB\to G,\; DG\to H\}.}
+\]
+
+
+\end{document}
